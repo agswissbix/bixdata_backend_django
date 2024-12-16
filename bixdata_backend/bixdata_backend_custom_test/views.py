@@ -3,7 +3,15 @@ from django.http import HttpResponse, JsonResponse
 import json
 
 def get_test(request):
-    return get_menu(request)
+    data = json.loads(request.body)
+    menuItem = data.get("menuItem")
+    response_data = {
+        "userId": 1,
+        "name": "John BixDoe",
+        "email": "johndoe@example.com",
+        "menuItem": menuItem+"-Backend"
+    }
+    return JsonResponse(response_data)
 
 def get_menu(request):
 # Declare the array
@@ -36,7 +44,7 @@ def get_menu(request):
     # Convert the array to JSON
     response_data = {
         "userId": 1,
-        "name": "John Doe",
+        "name": "John BixDoe",
         "email": "johndoe@example.com"
     }
     return JsonResponse(response_data)
