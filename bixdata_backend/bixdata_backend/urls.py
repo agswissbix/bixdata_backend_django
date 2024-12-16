@@ -1,5 +1,5 @@
 """
-URL configuration for bixdata_backend_django project.
+URL configuration for bixdata_backend project.
 
 The `urlpatterns` list routes URLs to views. For more information please see:
     https://docs.djangoproject.com/en/5.0/topics/http/urls/
@@ -15,8 +15,9 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    path('backend_app/', include('bixdata_backend_app.urls')),
+    path('backend_custom_test/', include('bixdata_backend_custom_test.urls')),
 ]
