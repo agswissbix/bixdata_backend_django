@@ -21,4 +21,25 @@ class SysTable:
         sql="SELECT * FROM sys_table_workspace"
         result=HelpderDB.sql_query(sql)
         return result
+    
+    @classmethod
+    def get_user_tables(cls,userid):
+        sql="""
+            SELECT
+            sys_table.id,
+            sys_table.description,
+            sys_user_table_order.userid,
+            sys_table.workspace,
+            sys_table_workspace.`order`,
+            sys_table_workspace.icon
+            FROM sys_table
+            INNER JOIN sys_user_table_order
+                ON sys_table.id = sys_user_table_order.tableid
+            INNER JOIN sys_table_workspace
+                ON sys_table.workspace = sys_table_workspace.name
+            WHERE sys_user_table_order.userid = 1
+            ORDER BY sys_table_workspace.`order`, sys_table.id
+        """
+        rows=HelpderDB.sql_query(sql)
+        return rows
         

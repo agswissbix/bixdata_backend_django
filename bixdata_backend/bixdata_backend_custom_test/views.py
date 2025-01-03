@@ -1,17 +1,40 @@
 from django.shortcuts import render
 from django.http import HttpResponse, JsonResponse
+from django.views.decorators.csrf import csrf_exempt
 import json
 
-def get_test(request):
-    data = json.loads(request.body)
-    menuItem = data.get("menuItem")
+def get_testget(request,menuitem='test'):
+    #data = json.loads(request.body)
+    #menuItem = 'test'#data.get("menuItem")
     response_data = {
         "userId": 1,
-        "name": "John BixDoe",
+        "name": "John BixDoe2",
         "email": "johndoe@example.com",
-        "menuItem": menuItem+"-Backend"
+        "menuItemBackend": menuitem+"-Backend"
     }
     return JsonResponse(response_data)
+
+@csrf_exempt
+def get_testpost(request):    
+    if request.method == 'POST':
+        try:
+            # Decodifica il corpo della richiesta JSON
+            data = json.loads(request.body)
+            selectedMenu1 = data.get('selectedMenu1')
+
+            # Crea una risposta basata sui dati ricevuti
+            response_data = {
+                "userId": 1,
+                "name": "John BixDoe2",
+                "email": "johndoe@example.com",
+                "menuItemBackend": f"{selectedMenu1}-Backend" if selectedMenu1 else "No Menu Item"
+            }
+            return JsonResponse(response_data)
+        except json.JSONDecodeError:
+            return JsonResponse({'error': 'Invalid JSON'}, status=400)
+
+    return JsonResponse({'error': 'Invalid request method'}, status=405)
+    
 
 def get_menu(request):
 # Declare the array
