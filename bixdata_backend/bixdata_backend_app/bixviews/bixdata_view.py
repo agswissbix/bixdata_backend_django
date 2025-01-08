@@ -41,98 +41,19 @@ def get_sidebarmenu_items(request):
 
 @csrf_exempt
 def get_table_records(request):
+    response={}
     if request.method == 'POST':
         try:
             payload = json.loads(request.body)
             tableid=payload['tableid']
+            searchterm=payload['searchTerm']
         except json.JSONDecodeError:
             return JsonResponse({'error': 'Invalid JSON'}, status=400)
-    response = {
-            "rows": [
-                {
-                    "recordid": "1",
-                    "css": "#",
-                    "fields": [
-                        {
-                            "recordid": "",
-                            "css": "",
-                            "type": "standard",
-                            "value": "macbook backend"
-                        },
-                        {
-                            "recordid": "",
-                            "css": "",
-                            "type": "standard",
-                            "value": "nero"
-                        },
-                        {
-                            "recordid": "",
-                            "css": "",
-                            "type": "standard",
-                            "value": "Laptop"
-                        },
-                        {
-                            "recordid": "",
-                            "css": "",
-                            "type": "standard",
-                            "value": "2k"
-                        },
-                    ]
-                },
-                {
-                    "recordid": "2",
-                    "css": "#",
-                    "fields": [
-                        {
-                            "recordid": "",
-                            "css": "",
-                            "type": "standard",
-                            "value": "surface"
-                        },
-                        {
-                            "recordid": "",
-                            "css": "",
-                            "type": "standard",
-                            "value": "bianco"
-                        },
-                        {
-                            "recordid": "",
-                            "css": "",
-                            "type": "standard",
-                            "value": "Laptop"
-                        },
-                        {
-                            "recordid": "",
-                            "css": "",
-                            "type": "standard",
-                            "value": "1k"
-                        },
-                    ]
-                },
-            ],
-            "columns": [
-                {
-                    "fieldtypeid": "Numero",
-                    "desc": "Product name"
-                },
-                {
-                    "fieldtypeid": "Numero",
-                    "desc": "Color"
-                },
-                {
-                    "fieldtypeid": "Numero",
-                    "desc": "Type"
-                },
-                {
-                    "fieldtypeid": "Numero",
-                    "desc": "Price"
-                },
-            ]
-        }
+    
 
 
     table=UserTable(tableid)
-    rows=table.get_results_records()
+    rows=table.get_results_records(searchTerm=searchterm)
     columns=[]
     columns=table.get_results_columns()
     response_columns=[]
