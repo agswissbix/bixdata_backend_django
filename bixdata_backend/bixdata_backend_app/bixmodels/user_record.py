@@ -22,6 +22,7 @@ from django_user_agents.utils import get_user_agent
 from django import template
 from bs4 import BeautifulSoup
 from django.db.models import OuterRef, Subquery
+from .helper_db import *
 
 bixdata_server = os.environ.get('BIXDATA_SERVER')
 
@@ -35,7 +36,13 @@ class UserRecord:
         self.master_recordid=''
         self.context='insert_fields'
         if recordid:
-            self.fields=self.db_helper.sql_query_row(f"SELECT * FROM user_{self.tableid} WHERE recordid_='{self.recordid}'")
+            self.fields=HelpderDB.sql_query(f"SELECT * FROM user_{self.tableid} WHERE recordid_='{self.recordid}'")
         else:
             self.fields=dict()
+
+    def get_record_badge_fields(self):
+        sql = f"SELECT sys_field.* FROM sys_field join sys_user_order on sys_field.fieldid=sys_user_order.fieldid WHERE sys_user_order.userid=1 AND sys_user_order.tableid='{self.tableid}' AND typePreference='campiFissi' ORDER BY fieldorder asc"
+
+        fields = HelpderDB.sql_query(sql)
+        return fields
     

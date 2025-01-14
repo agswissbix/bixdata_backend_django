@@ -4,12 +4,10 @@ from django.middleware.csrf import get_token
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
 import json
-from ..bixlogic.bixdata_logic import *
+from ..bixmodels.sys_table import *
+from ..bixmodels.user_record import *
+from ..bixmodels.user_table import *
 
-@login_required
-def get_menu_items(request):
-    menu_items_dict=BixdataLogic.get_menu_items()
-    return JsonResponse(menu_items_dict)
 
 
 @csrf_exempt
@@ -80,6 +78,29 @@ def get_table_records(request):
         response_rows.append(response_row)
     response['rows']=response_rows
     response['columns']=response_columns
+    return JsonResponse(response, safe=False)
+
+@csrf_exempt
+def get_record_badge(request):
+    response={}
+    if request.method == 'POST':
+        try:
+            payload = json.loads(request.body)
+            tableid=payload['tableid']
+            recordid=payload['recordid']
+        except json.JSONDecodeError:
+            return JsonResponse({'error': 'Invalid JSON'}, status=400)
+    
+    badge_items = []
+    badge_fields=UserRecord(tableid, recordid).get_record_badge_fields()
+    for badge_field in badge_fields:
+        badge_item={}
+        badge_item['fieldid']=badge_field['description']
+        badge_item['value']=badge_field['value']
+        badge_items.append(badge_item)
+    response['badgeItems']=badge_items
+    record=UserRecord(tableid)
+
     return JsonResponse(response, safe=False)
 
 @csrf_exempt
