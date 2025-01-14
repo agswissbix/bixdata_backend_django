@@ -10,7 +10,8 @@ urlpatterns = [
     path('csrf-token/', csrf_token_view, name='csrf_token'),
     path('home/', home_view, name='home'),
     path('get_sidebarmenu_items/', get_sidebarmenu_items, name='get_sidebarmenu_items'),
-    path('get_table_records/', get_table_records, name='get_table_records')
+    path('get_table_records/', get_table_records, name='get_table_records'),
+    path('set_record_fields/', set_record_fields, name='set_record_fields'),
     
     
     

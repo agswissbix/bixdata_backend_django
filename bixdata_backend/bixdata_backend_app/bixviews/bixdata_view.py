@@ -81,3 +81,25 @@ def get_table_records(request):
     response['rows']=response_rows
     response['columns']=response_columns
     return JsonResponse(response, safe=False)
+
+@csrf_exempt
+def set_record_fields(request):
+    if request.method == 'POST':
+        try:
+            payload = json.loads(request.body)
+            print('Payload ricevuto:', payload)  # Log per vedere cosa arriva
+
+            tableid = payload['tableid']
+            recordid = payload['recordid']
+            fields = payload['fields']
+            print('TableID:', tableid)
+            print('RecordID:', recordid)
+            print('Fields:', fields)
+
+        except json.JSONDecodeError:
+            return JsonResponse({'error': 'Invalid JSON'}, status=400)
+        except KeyError as e:
+            return JsonResponse({'error': f'Missing key: {str(e)}'}, status=400)
+
+    return JsonResponse({'status': 'ok'}, status=200)
+
