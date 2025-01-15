@@ -93,12 +93,8 @@ def get_record_badge(request):
     
     badge_items = []
     badge_fields=UserRecord(tableid, recordid).get_record_badge_fields()
-    for badge_field in badge_fields:
-        badge_item={}
-        badge_item['fieldid']=badge_field['description']
-        badge_item['value']=badge_field['value']
-        badge_items.append(badge_item)
-    response['badgeItems']=badge_items
+
+    response['badgeItems']=badge_fields
     record=UserRecord(tableid)
 
     return JsonResponse(response, safe=False)

@@ -36,13 +36,19 @@ class UserRecord:
         self.master_recordid=''
         self.context='insert_fields'
         if recordid:
-            self.fields=HelpderDB.sql_query(f"SELECT * FROM user_{self.tableid} WHERE recordid_='{self.recordid}'")
+            self.fields=HelpderDB.sql_query_row(f"SELECT * FROM user_{self.tableid} WHERE recordid_='{self.recordid}'")
         else:
             self.fields=dict()
 
     def get_record_badge_fields(self):
-        sql = f"SELECT sys_field.* FROM sys_field join sys_user_order on sys_field.fieldid=sys_user_order.fieldid WHERE sys_user_order.userid=1 AND sys_user_order.tableid='{self.tableid}' AND typePreference='campiFissi' ORDER BY fieldorder asc"
-
+        return_fields=[]
+        sql = f"SELECT sys_field.* FROM sys_field join sys_user_order on sys_field.fieldid=sys_user_order.fieldid WHERE sys_field.tableid='{self.tableid}' AND sys_user_order.userid=1 AND sys_user_order.tableid='{self.tableid}' AND typePreference='campiFissi' ORDER BY fieldorder asc"
         fields = HelpderDB.sql_query(sql)
-        return fields
+        for field in fields:
+            fieldid = field['fieldid']
+            return_field={}
+            return_field['fieldid']=fieldid
+            return_field['value']=self.fields[fieldid]
+            return_fields.append(return_field)
+        return return_fields
     
