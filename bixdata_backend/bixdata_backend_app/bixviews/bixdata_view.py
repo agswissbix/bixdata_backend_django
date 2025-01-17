@@ -90,9 +90,9 @@ def get_record_badge(request):
             recordid=payload['recordid']
         except json.JSONDecodeError:
             return JsonResponse({'error': 'Invalid JSON'}, status=400)
-    
-    badge_items = []
-    badge_fields=UserRecord(tableid, recordid).get_record_badge_fields()
+    badge_fields = []
+    if not Helper.isempty(recordid):
+        badge_fields=UserRecord(tableid, recordid).get_record_badge_fields()
 
     response['badgeItems']=badge_fields
     record=UserRecord(tableid)
@@ -142,5 +142,23 @@ def get_record_fields(request):
     response['recordid']=recordid
     response['fields']=fields
     record=UserRecord(tableid)
+
+    return JsonResponse(response, safe=False)
+
+
+@csrf_exempt
+def get_record_linked_tables(request):
+    response={}
+    if request.method == 'POST':
+        try:
+            payload = json.loads(request.body)
+            tableid=payload['tableid']
+            recordid=payload['recordid']
+        except json.JSONDecodeError:
+            return JsonResponse({'error': 'Invalid JSON'}, status=400)
+    
+    record=UserRecord(tableid, recordid)
+    linked_tables=record.get_linked_tables()
+    response['linkedTables']=linked_tables
 
     return JsonResponse(response, safe=False)

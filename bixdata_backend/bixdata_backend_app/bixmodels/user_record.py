@@ -28,18 +28,16 @@ from ..helper import *
 bixdata_server = os.environ.get('BIXDATA_SERVER')
 
 class UserRecord:
-    tableid=""
-    recordid=""
-    userid=1
-    master_tableid=""
-    master_recordid=""
-    values=dict()
-    fields=dict()
+
     context=""
     def __init__(self, tableid, recordid=None, userid=1):
         self.tableid=tableid
         self.recordid=recordid
         self.userid=userid
+        self.master_tableid=""
+        self.master_recordid=""
+        self.values=dict()
+        self.fields=dict()
         self.context='insert_fields'
         if tableid:
             fields=HelpderDB.sql_query(f"SELECT * FROM sys_field WHERE tableid='{self.tableid}'")
@@ -69,6 +67,7 @@ class UserRecord:
     
     def get_fields_detailed(self):
         fields_detailed=[]
+        print(self.tableid)
         for fieldid, field in self.fields.items():
             print(fieldid)
             if(not Helper.isempty(field['tablelink']) and Helper.isempty(field['keyfieldlink'])):
@@ -79,7 +78,11 @@ class UserRecord:
                 field_detailed['fieldid']="test1"+self.recordid
                 field_detailed['fieldorder']="1"
                 field_detailed['description']=field['description']  
-                field_detailed['value']={"code": self.values[fieldid], "value": self.values[fieldid]}
+                if self.recordid!="":
+                    field_detailed['value']={"code": self.values[fieldid], "value": self.values[fieldid]}
+                else:
+                    field_detailed['value']={"code": "", "value": ""}
+                
                 field_detailed['fieldtype']="Parola"
                 field_detailed['settings']={
                     "calcolato": "false",
@@ -129,3 +132,55 @@ class UserRecord:
             self.db_helper.sql_execute(sqlinsert)
             self.recordid=next_recordid
             self.save()
+
+    def get_linked_tables(self):
+        linked_tables=[]
+        linked_tables = [
+            {
+                "tableid": "company",
+                "description": "Azienda",
+                "rowsCount": 1,
+            },
+            {
+                "tableid": "contact",
+                "description": "Contatti",
+                "rowsCount": 1,
+            },
+            {
+                "tableid": "tableid",
+                "description": "siung",
+                "rowsCount": 1,
+            },
+            {
+                "tableid": "tableid",
+                "description": "siung",
+                "rowsCount": 1,
+            },
+            {
+                "tableid": "tableid",
+                "description": "siung",
+                "rowsCount": 1,
+            },
+            {
+                "tableid": "tableid",
+                "description": "siung",
+                "rowsCount": 1,
+            },
+            {
+                "tableid": "tableid",
+                "description": "siung",
+                "rowsCount": 1,
+            },
+            {
+                "tableid": "tableid",
+                "description": "siung",
+                "rowsCount": 1,
+            },
+            {
+                "tableid": "tableid",
+                "description": "siung",
+                "rowsCount": 1,
+            },
+        ]
+
+        return linked_tables
