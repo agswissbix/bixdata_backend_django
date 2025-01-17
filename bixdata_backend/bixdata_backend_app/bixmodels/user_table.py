@@ -55,7 +55,7 @@ class UserTable:
                 select_fields=select_fields+field
                 
         conditions="deleted_='N'"
-        conditions=conditions+f" AND companyname like '%{searchTerm}%' " 
+        #conditions=conditions+f" AND companyname like '%{searchTerm}%' " 
         for condition in conditions_list:
             conditions=conditions+f" AND {condition}"   
 

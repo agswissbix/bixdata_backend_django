@@ -91,3 +91,41 @@ class UserRecord:
 
         return fields_detailed
     
+    def save(self):
+        if self.recordid:
+            counter=0
+            sql=f"UPDATE user_{self.tableid} SET "
+            for fieldid,value in self.values.items():
+                if counter>0:
+                    sql=sql+","
+                if value!=None:  
+                    if type(value)==str:
+                        value = value.replace("'", "''")  
+                    sql=sql+f" {fieldid}='{value}' "
+                else:
+                    sql=sql+f" {fieldid}=null "
+                counter+=1
+            sql=sql+f" WHERE recordid_='{self.recordid}'"  
+            HelpderDB.sql_execute(sql) 
+        else:
+            sqlmax=f"SELECT MAX(recordid_) as max_recordid FROM user_{self.tableid}"
+            result=HelpderDB.sql_query_row(sqlmax)
+            max_recordid=result['max_recordid']
+            if max_recordid is None:
+                next_recordid = '00000000000000000000000000000001'
+            else:
+                next_recordid = str(int(max_recordid) + 1).zfill(32)
+            
+            sqlmax=f"SELECT MAX(id) as max_id FROM user_{self.tableid}"
+            result=HelpderDB.sql_query_row(sqlmax)
+            max_id=result['max_id']
+            if max_id is None:
+                next_id = 1
+            else:
+                next_id = max_id+1
+            
+            current_datetime=datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            sqlinsert=f"INSERT INTO user_{self.tableid} (recordid_,creatorid_,creation_,id) VALUES ('{next_recordid}',{self.userid},'{current_datetime}',{next_id}) "
+            self.db_helper.sql_execute(sqlinsert)
+            self.recordid=next_recordid
+            self.save()

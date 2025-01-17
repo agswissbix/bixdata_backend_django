@@ -117,7 +117,10 @@ def set_record_fields(request):
             return JsonResponse({'error': 'Invalid JSON'}, status=400)
         except KeyError as e:
             return JsonResponse({'error': f'Missing key: {str(e)}'}, status=400)
-
+    if tableid=='company':
+        record=UserRecord(tableid, recordid)
+        record.values['companyname']="Thinstuff s.r.o. test"
+        record.save()
     return JsonResponse({'status': 'ok'}, status=200)
 
 @csrf_exempt
