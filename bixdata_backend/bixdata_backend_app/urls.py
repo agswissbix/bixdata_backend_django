@@ -12,6 +12,7 @@ urlpatterns = [
     path('get_sidebarmenu_items/', get_sidebarmenu_items, name='get_sidebarmenu_items'),
     path('get_table_records/', get_table_records, name='get_table_records'),
     path('get_record_badge/', get_record_badge, name='get_record_badge'),
+    path('get_record_fields/', get_record_fields, name='get_record_fields'),
     path('set_record_fields/', set_record_fields, name='set_record_fields'),
     
     

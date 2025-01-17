@@ -120,3 +120,54 @@ def set_record_fields(request):
 
     return JsonResponse({'status': 'ok'}, status=200)
 
+@csrf_exempt
+def get_record_fields(request):
+    response={}
+    if request.method == 'POST':
+        try:
+            payload = json.loads(request.body)
+            tableid=payload['tableid']
+            recordid=payload['recordid']
+            print(recordid)
+        except json.JSONDecodeError:
+            return JsonResponse({'error': 'Invalid JSON'}, status=400)
+    
+    badge_items = []
+    badge_fields=UserRecord(tableid, recordid).get_record_badge_fields()
+
+    fields = [
+    {
+        "tableid": "1",
+        "fieldid": "test1",
+        "fieldorder": "1",
+        "description": "Test 1",
+        "value": {"code": recordid[-5:], "value": recordid[-5:]},
+        "fieldtype": "Parola",
+        "settings": {
+            "calcolato": "false",
+            "default": "",
+            "nascosto": "false",
+            "obbligatorio": "false"
+        }
+    },
+    {
+        "tableid": "1",
+        "fieldid": "test2",
+        "fieldorder": "2",
+        "description": "Test 2",
+        "value": {"code": "2", "value": "2"},
+        "fieldtype": "Numero",
+        "settings": {
+            "calcolato": "false",
+            "default": "",
+            "nascosto": "false",
+            "obbligatorio": "false"
+        }
+    }
+]
+
+    response['recordid']=recordid
+    response['fields']=fields
+    record=UserRecord(tableid)
+
+    return JsonResponse(response, safe=False)
