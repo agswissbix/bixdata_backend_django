@@ -23,22 +23,33 @@ from django import template
 from bs4 import BeautifulSoup
 from django.db.models import OuterRef, Subquery
 from .helper_db import *
+from ..helper import *
 
 bixdata_server = os.environ.get('BIXDATA_SERVER')
 
 class UserRecord:
-    
+    tableid=""
+    recordid=""
+    userid=1
+    master_tableid=""
+    master_recordid=""
+    values=dict()
+    fields=dict()
+    context=""
     def __init__(self, tableid, recordid=None, userid=1):
         self.tableid=tableid
         self.recordid=recordid
         self.userid=userid
-        self.master_tableid=''
-        self.master_recordid=''
         self.context='insert_fields'
+        if tableid:
+            fields=HelpderDB.sql_query(f"SELECT * FROM sys_field WHERE tableid='{self.tableid}'")
+            for field in fields:
+                self.fields[field['fieldid']]=field
+
+
         if recordid:
-            self.fields=HelpderDB.sql_query_row(f"SELECT * FROM user_{self.tableid} WHERE recordid_='{self.recordid}'")
-        else:
-            self.fields=dict()
+            self.values=HelpderDB.sql_query_row(f"SELECT * FROM user_{self.tableid} WHERE recordid_='{self.recordid}'")
+
 
     def get_record_badge_fields(self):
         return_fields=[]
@@ -48,7 +59,35 @@ class UserRecord:
             fieldid = field['fieldid']
             return_field={}
             return_field['fieldid']=fieldid
-            return_field['value']=self.fields[fieldid]
+            return_field['value']=self.values[fieldid]
             return_fields.append(return_field)
         return return_fields
+    
+    def get_fields_plain(self):
+        fields_plain=self.fields
+        return self.fields_plain
+    
+    def get_fields_detailed(self):
+        fields_detailed=[]
+        for fieldid, field in self.fields.items():
+            print(fieldid)
+            if(not Helper.isempty(field['tablelink']) and Helper.isempty(field['keyfieldlink'])):
+                field['fieldtypeid']='Linked'
+            if field['fieldtypeid']!='Linked':
+                field_detailed={}
+                field_detailed['tableid']="1"
+                field_detailed['fieldid']="test1"+self.recordid
+                field_detailed['fieldorder']="1"
+                field_detailed['description']=field['description']  
+                field_detailed['value']={"code": self.values[fieldid], "value": self.values[fieldid]}
+                field_detailed['fieldtype']="Parola"
+                field_detailed['settings']={
+                    "calcolato": "false",
+                    "default": "",
+                    "nascosto": "false",
+                    "obbligatorio": "false"
+                }
+                fields_detailed.append(field_detailed)
+
+        return fields_detailed
     
