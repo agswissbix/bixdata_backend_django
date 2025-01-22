@@ -14,6 +14,7 @@ urlpatterns = [
     path('get_record_badge/', get_record_badge, name='get_record_badge'),
     path('get_record_fields/', get_record_fields, name='get_record_fields'),
     path('set_record_fields/', set_record_fields, name='set_record_fields'),
+    path('create_pdf/', create_pdf, name='create_pdf'),
     
     
     

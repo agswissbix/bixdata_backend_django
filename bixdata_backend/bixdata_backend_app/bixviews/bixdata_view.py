@@ -7,6 +7,7 @@ import json
 from ..bixmodels.sys_table import *
 from ..bixmodels.user_record import *
 from ..bixmodels.user_table import *
+import pdfkit
 
 
 
@@ -162,3 +163,38 @@ def get_record_linked_tables(request):
     response['linkedTables']=linked_tables
 
     return JsonResponse(response, safe=False)
+
+@csrf_exempt
+def create_pdf(request):
+    try:
+        # Configura il percorso di wkhtmltopdf
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+        wkhtmltopdf_path = os.path.join(script_dir, 'wkhtmltopdf.exe')
+        config = pdfkit.configuration(wkhtmltopdf=wkhtmltopdf_path)
+
+        # Contenuto HTML per il PDF
+        content = "<div>TEST</div>"
+        row={}
+        content = render_to_string('pdf/gasoli.html', row)
+
+        # Genera il percorso del file PDF
+        filename_with_path = os.path.join(os.path.dirname(script_dir), 'static', 'pdf', 'test.pdf')
+
+        # Genera il PDF dal contenuto HTML
+        pdfkit.from_string(content, filename_with_path, configuration=config, options={"enable-local-file-access": ""})
+
+        # Leggi il file PDF e restituiscilo come risposta
+        with open(filename_with_path, 'rb') as fh:
+            response = HttpResponse(fh.read(), content_type="application/pdf")
+            response['Content-Disposition'] = 'inline; filename=test.pdf'
+        
+        return response
+
+    except Exception as e:
+        # In caso di errore, restituisci un errore
+        return JsonResponse({'error': str(e)}, status=500)
+
+    finally:
+        # Rimuovi il file PDF temporaneo, se esiste
+        if os.path.exists(filename_with_path):
+            os.remove(filename_with_path)
