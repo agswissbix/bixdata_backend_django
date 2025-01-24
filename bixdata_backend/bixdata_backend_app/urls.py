@@ -5,6 +5,7 @@ from .bixviews.bixdata_view import *
 from .bixviews.settings_view import *
 
 urlpatterns = [
+    path('test_connection/', test_connection , name='login'),
     path('login/', login_view , name='login'),
     path('logout/', logout_view, name='logout'),
     path('csrf-token/', csrf_token_view, name='csrf_token'),

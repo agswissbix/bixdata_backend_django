@@ -12,6 +12,13 @@ import pdfkit
 
 
 @csrf_exempt
+def test_connection(request):
+    response = {
+        "Stato": "Connessione riuscita",
+    }
+    return JsonResponse(response, safe=False)
+
+@csrf_exempt
 def get_sidebarmenu_items(request):
     tables=SysTable.get_user_tables(1)
     workspaces_tables=dict()
