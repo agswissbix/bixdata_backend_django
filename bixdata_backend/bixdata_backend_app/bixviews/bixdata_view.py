@@ -205,3 +205,25 @@ def create_pdf(request):
         # Rimuovi il file PDF temporaneo, se esiste
         if os.path.exists(filename_with_path):
             os.remove(filename_with_path)
+
+
+from ..bixmodels.helper_db import *
+@csrf_exempt
+def test_linkedmaster(request):
+    print('ok reach django')
+    response={}
+    if request.method == 'POST':
+        try:
+            payload = json.loads(request.body)
+            tableid=payload['tableid']
+            tableid= f"user_{tableid}"
+            tableid = str(tableid)
+            with connection.cursor() as cursor:
+                query = f"SELECT recordid_, name FROM {tableid} WHERE name LIKE %s"
+                cursor.execute(query, [f"%{payload['searchTerm']}%"])
+                rows = HelpderDB.dictfetchall(cursor)
+            print(rows)                
+        except json.JSONDecodeError:
+            return JsonResponse({'error': 'Invalid JSON'}, status=400)
+
+    return JsonResponse(rows, safe=False)
