@@ -227,3 +227,19 @@ def test_linkedmaster(request):
             return JsonResponse({'error': 'Invalid JSON'}, status=400)
 
     return JsonResponse(rows, safe=False)
+
+@csrf_exempt
+def get_user_theme(request):
+    response={}
+    try:
+        payload = json.loads(request.body)
+        userid=payload['userid']
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT * FROM v_sys_user_settings WHERE bixid = %s and setting='theme'", [userid])
+            theme = HelpderDB.dictfetchall(cursor)
+            theme = theme[0]['value']
+            response['theme'] = theme
+    except json.JSONDecodeError:
+        return JsonResponse({'error': 'Invalid JSON'}, status=400)
+    
+    return JsonResponse(response['theme'], safe=False)

@@ -17,6 +17,7 @@ urlpatterns = [
     path('set_record_fields/', set_record_fields, name='set_record_fields'),
     path('create_pdf/', create_pdf, name='create_pdf'),
     path('test_linkedmaster/', test_linkedmaster, name='test_linkedmaster'),
+    path('get_user_theme/', get_user_theme, name='get_user_theme'),
     
     
     
