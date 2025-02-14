@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'bixdata_backend_app',
     'bixdata_backend_custom_test'
+    
 ]
 
 MIDDLEWARE = [

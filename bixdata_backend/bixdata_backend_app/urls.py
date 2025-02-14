@@ -18,6 +18,9 @@ urlpatterns = [
     path('create_pdf/', create_pdf, name='create_pdf'),
     path('test_linkedmaster/', test_linkedmaster, name='test_linkedmaster'),
     path('get_user_theme/', get_user_theme, name='get_user_theme'),
+    path('enable_2fa/', enable_2fa, name='enable_2fa'),
+    path('verify_2fa/', verify_2fa, name='verify_2fa'),
+    path('disable_2fa/', disable_2fa, name='disable_2fa'),
     
     
     

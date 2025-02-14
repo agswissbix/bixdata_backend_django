@@ -243,3 +243,88 @@ def get_user_theme(request):
         return JsonResponse({'error': 'Invalid JSON'}, status=400)
     
     return JsonResponse(response['theme'], safe=False)
+
+
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from django.contrib.auth.decorators import login_required
+import pyotp
+import qrcode
+import base64
+from io import BytesIO
+
+@csrf_exempt
+@login_required
+def enable_2fa(request):
+    user = request.user
+    
+    if request.method != "POST":
+        return JsonResponse({"message": "Metodo non permesso"}, status=405)
+
+    # Controlla se il 2FA è già attivo
+    if request.session.get("otp_secret"):
+        return JsonResponse({"message": "2FA già attivato"}, status=400)
+
+    try:
+        # Genera un segreto OTP per l'utente
+        secret = pyotp.random_base32()
+        request.session["otp_secret"] = secret
+        request.session.save()
+
+        # Genera l'URL del QR Code
+        totp = pyotp.TOTP(secret)
+        otp_url = totp.provisioning_uri(name=user.username, issuer_name="MyApp")
+
+        # Genera il QR Code e convertilo in base64
+        img = qrcode.make(otp_url)
+        img_io = BytesIO()
+        img.save(img_io, format="PNG")
+        qr_base64 = base64.b64encode(img_io.getvalue()).decode('utf-8')
+
+        return JsonResponse({"otp_url": otp_url, "qr_code": qr_base64})
+
+    except Exception as e:
+        return JsonResponse({"message": f"Errore nel generare il QR: {str(e)}"}, status=500)
+
+
+
+@csrf_exempt
+@login_required
+def verify_2fa(request):
+    if request.method != "POST":
+        return JsonResponse({"message": "Metodo non permesso"}, status=405)
+
+    # Ottieni i dati JSON
+    data = json.loads(request.body)
+    otp_token = data.get("otp")
+    
+    if not otp_token:
+        return JsonResponse({"message": "Codice OTP mancante"}, status=400)
+    
+    secret = request.session.get("otp_secret")
+    if not secret:
+        return JsonResponse({"message": "2FA non attivato per questo utente"}, status=400)
+
+    totp = pyotp.TOTP(secret)
+    if totp.verify(otp_token):
+        return JsonResponse({"message": "Autenticazione 2FA riuscita"})
+    else:
+        return JsonResponse({"message": "Codice OTP errato"}, status=400)
+    
+
+@csrf_exempt
+@login_required
+def disable_2fa(request):
+    if request.method != "POST":
+        return JsonResponse({"message": "Metodo non permesso"}, status=405)
+    
+    # Controlla se il 2FA è attivo
+    if not request.session.get("otp_secret"):
+        return JsonResponse({"message": "2FA non è attivo per questo utente"}, status=400)
+
+    # Rimuovi il segreto dalla sessione
+    del request.session["otp_secret"]
+    request.session.save()
+    
+    return JsonResponse({"message": "2FA disabilitato con successo"})
+
